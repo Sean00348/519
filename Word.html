@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>519 白色恐怖記憶日 - 文字雲歷史走讀</title>
+    <style>
+        /* 視覺調色盤：嚴格遵循設計圖中的暗黑、深藍、銳利白與警戒紅 */
+        :root {
+            --bg-color: #0b1a30;        /* 壓抑的深藍色背景 */
+            --text-color: #ffffff;      /* 銳利的純白文字 */
+            --accent-black: #050505;    /* 手繪版畫感的粗糙黑塊 */
+            --alert-red: #d32f2f;       /* 警告、歷史傷痕的深紅色 */
+            --desc-gray: #b0c4de;       /* 柔和的藍灰字，用於細節 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 模擬海報邊緣的手繪粗糙外框 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 3px dashed rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* 標題區：設計圖不規則多邊形色塊 */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            z-index: 10;
+        }
+
+        .title-container {
+            background-color: var(--accent-black);
+            display: inline-block;
+            padding: 25px 50px;
+            /* 運用 clip-path 裁切出海報感的俐落銳利多邊形 */
+            clip-path: polygon(2% 0%, 98% 8%, 100% 90%, 0% 100%);
+            transform: rotate(-1deg);
+            border-left: 5px solid var(--alert-red);
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            letter-spacing: 6px;
+            font-weight: 900;
+            text-shadow: 2px 2px 0px var(--alert-red);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            margin-top: 12px;
+            color: var(--desc-gray);
+            letter-spacing: 3px;
+        }
+
+        /* 文字雲舞台：不規則錯落排列 */
+        .cloud-stage {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding: 20px;
+            flex-grow: 1;
+            z-index: 5;
+        }
+
+        /* 文字雲單一詞彙物件 */
+        .word-tag {
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+            padding: 6px 12px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* 滑鼠懸停：重現海報般的突兀黑底與翻轉感 */
+        .word-tag:hover {
+            background-color: var(--accent-black);
+            color: #ffffff;
+            transform: scale(1.18) rotate(2deg) !important;
+            box-shadow: 4px 4px 0px var(--alert-red);
+            border: 1px solid rgba(255,255,255,0.3);
+            z-index: 20;
+        }
+
+        /* 字級與初始不規則角度分佈 */
+        .weight-xs { font-size: 1.1rem; opacity: 0.6; font-weight: 400; }
+        .weight-sm { font-size: 1.3rem; opacity: 0.75; font-weight: 500; }
+        .weight-md { font-size: 1.8rem; opacity: 0.9; font-weight: 700; }
+        .weight-lg { font-size: 2.4rem; opacity: 1; font-weight: 900; text-decoration: underline; text-decoration-color: var(--alert-red); }
+
+        /* 彈出詳細視窗 (Modal) */
+        .modal-mask {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(3, 8, 16, 0.85);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-mask.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-window {
+            background-color: #11223b;
+            border: 2px solid var(--text-color);
+            width: 90%;
+            max-width: 650px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 15px 15px 0px var(--accent-black);
+            /* 模擬海報右下角的切角塊面 */
+            clip-path: polygon(0% 0%, 100% 0%, 100% 92%, 95% 100%, 0% 100%);
+        }
+
+        .modal-header {
+            background-color: var(--accent-black);
+            padding: 8px 15px;
+            display: inline-block;
+            transform: skewX(-5deg);
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--alert-red);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .content-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            color: var(--alert-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .history-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            text-align: justify;
+            color: #f0f0f0;
+        }
+
+        .student-box {
+            background-color: rgba(5, 5, 5, 0.4);
+            padding: 15px 20px;
+            border-left: 4px solid var(--desc-gray);
+            margin-top: 25px;
+        }
+
+        .student-text {
+            font-size: 1rem;
+            font-style: italic;
+            line-height: 1.6;
+            color: var(--desc-gray);
+        }
+
+        .close-trigger {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-black);
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            padding: 5px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .close-trigger:hover {
+            background-color: var(--alert-red);
+            border-color: var(--alert-red);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="title-container">
+            <h1>519 白色恐怖記憶日</h1>
+            <div class="subtitle">關鍵字歷史走讀：記憶歷史，走向自由公義的未來</div>
+        </div>
+    </header>
+
+    <main class="cloud-stage" id="cloudStage"></main>
+
+    <div class="modal-mask" id="modalMask">
+        <div class="modal-window">
+            <button class="close-trigger" id="closeBtn">CLOSE ✕</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">關鍵字</h2>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-label">【 歷史背景 】</div>
+                <p class="history-text" id="historyText">歷史背景內容...</p>
+            </div>
+
+            <div class="student-box">
+                <div class="section-label">【 學生怎麼看 】</div>
+                <p class="student-text" id="studentText">學生的現代思考...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 完全依據 519 網站文案 CSV 載入的 20 個完整詞彙資料庫
+        const whiteTerrorData = [
+            { word: "戒嚴令", weight: "weight-lg", bg: "1949年5月19日頒佈，宣告臺灣進入戒嚴狀態，長達38年之久，嚴重限制人民言論、集會、結社與人身自由。", student: "戒嚴令限制出版、言論到思想，我們需要更加珍惜今天能自由生活的環境。" },
+            { word: "言論自由", weight: "weight-lg", bg: "言論自由是人民表達意見、批評政府及分享思想的基本權利。", student: "不同意見不應成為被攻擊或迫害的理由，而是民主社會共同討論、彼此理解的開始。" },
+            { word: "共產黨", weight: "weight-md", bg: "1940至1950年代正值國共內戰、第二次世界大戰結束及冷戰初期，社會充滿劇烈變動。當時部分知識分子、學生、教師與青年接觸共產主義或左翼思想，其原因十分多元，或受到師友、讀書會與時代氛圍影響。對許多人而言，共產主義是一種政治理想或社會改革的想像，而非今日人們所理解的中國共產黨政治體制。", student: "歷史上的「共產黨」與今日社會對共產黨的印象並不能完全畫上等號。理解白色恐怖是要理解不同時代的人們，如何在特定的歷史環境下做出選擇。" },
+            { word: "威權制度", weight: "weight-md", bg: "台灣的威權體制指1945年至1992年間，中國國民黨實行「以黨領政」的「黨國體制」 。", student: "當權力過度集中，人民便容易失去監督政府的能力。" },
+            { word: "二二八事件", weight: "weight-lg", bg: "1947年二二八事件源於查緝私菸衝突，引發全臺抗爭，政府武力鎮壓造成大量傷亡。許多人受二二八事件的影響而產生左傾思想。", student: "地下黨組織是在二二八事件以後才逐漸成長起來，兩者之間關聯比我想的還接近。" },
+            { word: "讀書會", weight: "weight-md", bg: "戒嚴時期部分青年透過讀書會討論文學、哲學與社會思想，但政府常懷疑其具有政治目的，因此不少讀書會成員遭到逮捕。", student: "很多在今日看來是積極、上進，關心社會議題的行為，沒有想到在過去卻是犯罪。" },
+            { word: "AudioWalk", weight: "weight-sm", bg: "AudioWalk（聲音走讀）是一種結合語音導覽與實地踏查的學習方式，參與者透過耳機與現場環境同步了解歷史事件。", student: "透過 AudioWalk 一邊行走、一邊聆聽故事，比起文字更有身歷其境的感覺。" },
+            { word: "校史", weight: "weight-sm", bg: "校史記錄學校發展及重要事件，也反映不同時代的社會背景。透過校史可以理解校園與白色恐怖、人權歷史之間的連結。", student: "原來每天生活的校園也曾經歷白色恐怖。校史不著重建築與年代，更記錄著一群人的故事與時代的記憶。" },
+            { word: "實境走讀", weight: "weight-sm", bg: "實境走讀是走入歷史現場，透過建築、街道及故事理解過去事件，比單純閱讀教材更能感受歷史脈絡。", student: "真正走到歷史發生的地方，能更深刻理解事件的背景與意義。" },
+            { word: "國家暴力", weight: "weight-md", bg: "國家暴力是政府利用軍隊、警察或司法力量，對人民進行不當壓迫、拘禁或迫害。國家暴力也造就受難者與其家屬的政治暴力創傷。", student: "國家原本應該保護人民，但在威權時代卻轉身成為加害者，這讓人反思權力監督的重要。" },
+            { word: "白色恐怖", weight: "weight-lg", bg: "白色恐怖是指威權政府在戒嚴時期利用法律與情治系統，對異議人士進行逮捕、審判、監禁或槍決的統治時期，造成嚴重的社會恐懼。", student: "歷史的陰影不應該被遺忘，理解白色恐怖是為了讓未來的臺灣能走在更自由的路上。" },
+            { word: "歷史不義遺址", weight: "weight-md", bg: "指威權統治時期，國家侵害人權事件的發生場所，如偵訊、審判、關押、槍決等地點。現地保存不義遺址有助於社會直面歷史真相。", student: "每天習以為常的路口或老建築，過去竟然是關押或審判人的地方，讓人起雞皮疙瘩。" },
+            { word: "密告與告密", weight: "weight-sm", bg: "威權體制下，政府透過獎金與恐懼制度，鼓勵社會大眾、同事、甚至親友之間互相檢舉告密，導致人與人之間失去互信。", student: "在恐懼的統治下，連身邊最親近的人都無法信任，這才是白色恐怖最令人窒息的地方。" },
+            { word: "受難者家屬", weight: "weight-md", bg: "政治受難者的家屬在事件發生後，長期活在社會排擠、情治監控與經濟困頓的煎熬中，其承受的隱形創傷往往延續數代。", student: "不只是受難者本人痛苦，活下來的家屬更要帶著污名和恐懼過一輩子，轉型正義也該撫平他們的痛。" },
+            { word: "記憶日", weight: "weight-sm", bg: "行政院核定每年5月19日為「白色恐怖記憶日」，期盼透過紀念活動，讓臺灣社會共同記取威權時期的歷史教訓。", student: "訂定記憶日不是為了製造仇恨，而是為了讓我們不要忘記今天擁有的民主是前人犧牲換來的。" },
+            { word: "審查制度", weight: "weight-sm", bg: "威權政府對出版品、歌曲、戲劇及電影進行嚴格的事前或事後審查，凡是不符合官方意識形態的內容皆會被查禁、塗黑或沒收。", student: "以前連唱一首歌、看一本小說都要被管，現在能隨便上網發表意見真的很幸福。" },
+            { word: "自白書", weight: "weight-sm", bg: "在情治單位審訊期間，受難者往往在面臨長期不讓睡覺、刑求折磨的精神與肉體壓力下，被迫寫下承認不實罪名的自白文書。", student: "那些自白書上的簽名和指印，背後到底藏了多少不為人知的痛苦與絕望。" },
+            { word: "政治施暴者", weight: "weight-xs", bg: "在國家機器中執行壓迫體制的決策者、審判官、情治人員與密探，追尋他們的歷史責任是轉型正義中的重要一環。", student: "找出真相不只是為了懲罰，而是要明白體制是怎麼讓人變成國家暴力的共犯。" },
+            { word: "519綠島走讀", weight: "weight-sm", bg: "每年5月中旬，受難者與家屬、青年學生會重返曾關押大量政治犯的綠島（不義遺址），進行記憶傳承與歷史走讀。", student: "親自去一趟綠島，看著那些高牆和牢房，比課本上讀到千言萬語都還要震撼。" },
+            { word: "人權博物館", weight: "weight-md", bg: "如景美與綠島兩大白色恐怖紀念園區，負責妥善保存白恐檔案、不義遺址，並轉化為對公眾開放的人權教育基地。", student: "人權博物館的存在就像是歷史的防毒軟體，提醒我們隨時要注意並捍衛得來不易的自由。" }
+        ];
+
+        const stage = document.getElementById('cloudStage');
+
+        // 打亂順序（隨機洗牌），營造自然的文字雲錯落視覺
+        const shuffledData = [...whiteTerrorData].sort(() => Math.random() - 0.5);
+
+        // 動態生成文字雲
+        shuffledData.forEach((item, index) => {
+            const tag = document.createElement('a');
+            tag.href = '#';
+            tag.className = `word-tag ${item.weight}`;
+            tag.textContent = item.word;
+
+            // 隨機賦予一點點不同的微小旋轉角度（-5deg 到 5deg 間），呼應手繪不規則海報感
+            const randomRotate = (Math.random() * 10 - 5).toFixed(1);
+            tag.style.transform = `rotate(${randomRotate}deg)`;
+
+            // 點擊事件：跳出詳細視窗
+            tag.addEventListener('click', (e) => {
+                e.preventDefault();
+                showDetails(item.word, item.bg, item.student);
+            });
+
+            stage.appendChild(tag);
+        });
+
+        // 彈出視窗控制邏輯
+        const mask = document.getElementById('modalMask');
+        const mTitle = document.getElementById('modalTitle');
+        const mHistory = document.getElementById('historyText');
+        const mStudent = document.getElementById('studentText');
+        const closeBtn = document.getElementById('closeBtn');
+
+        function showDetails(word, background, studentView) {
+            mTitle.textContent = word;
+            mHistory.textContent = background;
+            mStudent.textContent = studentView;
+            mask.classList.add('show');
+        }
+
+        function hideDetails() {
+            mask.classList.remove('show');
+        }
+
+        closeBtn.addEventListener('click', hideDetails);
+        mask.addEventListener('click', (e) => {
+            if (e.target === mask) hideDetails();
+        });
+    </script>
+</body>
+</html>
